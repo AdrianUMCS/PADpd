@@ -1,0 +1,122 @@
+import socket
+
+def copy_txt():
+    file_name = "plik.txt" #nazwa pliku
+
+    try:
+        with open(file_name, 'r') as file:
+            content = file.read()
+        with open('lab1zad1.txt', 'w') as new_file:
+            new_file.write(content)
+
+        print("Skopiowano do pliku lab1zad1.txt.")
+
+    except FileNotFoundError:
+        print("Podany plik nie istnieje.")
+
+def copy_png():
+    file_name = "photo.png"
+
+    try:
+        with open(file_name, 'rb') as file: #binarnie
+            content = file.read()
+
+
+        with open('lab1zad2.png', 'wb') as new_file:
+            new_file.write(content)
+
+            print("Plik PNG został skopiowany do pliku lab1zad1.png.")
+
+    except FileNotFoundError:
+        print("Podany plik nie istnieje.")
+
+
+import re
+
+
+def czy_poprawne_ip(ip):
+    #ip ="255.255.16.13"
+    ip_wzor = (r"^((25[0-5]|"
+               r"2[0-4][0-9]|"
+               r"[01]?[0-9][0-9]?)\.)"
+               r"{3}"
+               r"(25[0-5]|"
+               r"2[0-4][0-9]|"
+               r"[01]?[0-9][0-9]?)$")
+
+    if re.match(ip_wzor, ip):
+        print("Adres IP jest prawidłowy.")
+    else:
+        print("Podany adres IP jest nieprawidłowy.")
+
+
+def get_hostname():
+    #domyslne dla testow
+    ip = "192.168.1.1" #funbox.home
+    #ip=input()
+    try:
+        hostname = socket.gethostbyaddr(ip)[0]
+        print(f"Nazwa hosta dla {ip} to: {hostname}")
+    except socket.herror:
+        print("Nie można znaleźć nazwy hosta.")
+
+def get_ip():#from hostname
+    # domyslne dla testow
+    hostname="funbox.home"
+    #hostname=input()
+    try:
+        ip_address = socket.gethostbyname(hostname)
+        print(ip_address)
+    except socket.gaierror:
+        print("err")
+
+def zad6():
+    arg1=input("Podaj adres serwera: ")
+    arg2=int(input("Podaj port: "))
+    #if (czy_poprawne_ip(arg1)):
+    #    arg1=get_hostname(arg1)
+
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error as e:
+        print("ERR", e.strerror)
+        return
+
+    try:
+        sock.connect((arg1, arg2))
+    except socket.error as e:
+        print("Błąd przy łączeniu z serwerem ", e.strerror)
+        return
+
+    print("Połączono z ", arg1, " na porcie ", arg2)
+
+
+
+def zad7():
+    serw=input("Podaj serwer: ")
+    ports=range(80,100)
+    print(f"Rozpoczynam skanowanie hosta {serw}...")
+    for port in ports:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            result = sock.connect_ex((serw, port))
+            if result == 0:
+                print(f"Port {port}: Otwarty")
+            else:
+                print(f"Port {port}: Zamknięty")
+            sock.close()
+        except socket.gaierror:
+            print("Hostname nieprawidłowy.")
+            break
+        except socket.error:
+            print("Nie można połączyć się z hostem.")
+            break
+
+copy_txt()
+copy_png()
+czy_poprawne_ip("255.255.16.13")
+
+get_hostname()
+get_ip()
+zad6()
+zad7()
